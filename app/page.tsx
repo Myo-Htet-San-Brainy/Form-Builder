@@ -1,21 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-
-interface FormField {
-  id: string;
-  question: string;
-  type?: string;
-}
-
-interface Form {
-  title: string;
-  formFields: FormField[];
-}
+import { Form } from "./entities/form";
 
 const initialState = {
-  title: "",
-  formFields: [{ id: uuidv4(), question: "" }],
+  formFields: [{ id: uuidv4() }],
 };
 
 const allowedAnswerTypes = ["text", "number"];
@@ -96,6 +85,42 @@ const Page = () => {
       };
     });
   }
+  function handleFieldDuplicate(id: string | number) {
+    const newId = uuidv4();
+    setForm((prevState) => {
+      const itemToDuplicate = prevState.formFields.find(
+        (field) => field.id === id
+      );
+      if (!itemToDuplicate) {
+        return prevState;
+      }
+      const newField = {
+        ...itemToDuplicate,
+        id: newId,
+      };
+      return {
+        title: prevState.title,
+        formFields: [...prevState.formFields, newField],
+      };
+    });
+  }
+  function handleFieldRequired(
+    id: string | number,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+    setForm((prevState) => {
+      const updatedFields = prevState.formFields.map((field) => {
+        if (field.id === id) {
+          return { ...field, required: e.target.checked };
+        }
+        return field;
+      });
+      return {
+        title: prevState.title,
+        formFields: updatedFields,
+      };
+    });
+  }
   return (
     <div>
       {/* actions */}
@@ -112,6 +137,8 @@ const Page = () => {
           handleFieldAnswerTypeChange={handleFieldAnswerTypeChange}
           handleFieldQuestionChange={handleFieldQuestionChange}
           handleFieldDelete={handleFieldDelete}
+          handleFieldDuplicate={handleFieldDuplicate}
+          handleFieldRequired={handleFieldRequired}
         />
       )}
     </div>
@@ -123,16 +150,21 @@ interface FormBuilderProps {
   handleAddNewField: () => void;
   handleFormTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleFieldQuestionChange: (
-    id: string | number,
+    id: string,
     e: React.ChangeEvent<HTMLInputElement>
   ) => void;
   handleFieldAnswerTypeChange: (
-    id: string | number,
+    id: string,
     e: React.ChangeEvent<HTMLSelectElement>
   ) => void;
   handleFieldDelete: (
-    id: string | number,
+    id: string,
     e: React.MouseEvent<HTMLButtonElement>
+  ) => void;
+  handleFieldDuplicate: (id: string) => void;
+  handleFieldRequired: (
+    id: string,
+    e: React.ChangeEvent<HTMLInputElement>
   ) => void;
 }
 const FormBuilder: React.FC<FormBuilderProps> = ({
@@ -142,6 +174,8 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
   handleFieldQuestionChange,
   handleFieldAnswerTypeChange,
   handleFieldDelete,
+  handleFieldDuplicate,
+  handleFieldRequired,
 }) => {
   return (
     <div>
@@ -193,8 +227,19 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
           </div>
           {/* actions */}
           <div>
+            <div>
+              <label htmlFor="field-required">Required</label>
+              <input
+                id="field-required"
+                type="checkbox"
+                onChange={(e) => handleFieldRequired(field.id, e)}
+              />
+            </div>
             <button onClick={(e) => handleFieldDelete(field.id, e)}>
               delete
+            </button>
+            <button onClick={() => handleFieldDuplicate(field.id)}>
+              duplicate
             </button>
           </div>
         </div>
