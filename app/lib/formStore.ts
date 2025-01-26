@@ -1,4 +1,4 @@
-import { create } from "Zustand";
+import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { Form } from "../entities/form";
 import { convertFieldType, FieldTypes } from "../utils/index";
