@@ -1,186 +1,93 @@
 "use client";
 import React, { useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Form } from "./entities/form";
+import { FormField } from "./entities/form";
+import { Circle } from "lucide-react";
+import { useFormStore } from "./lib/formStore";
 
-const initialState = {
-  formFields: [{ id: uuidv4() }],
-};
-
-const allowedAnswerTypes = ["text", "number"];
+const allowedAnswerTypes = [
+  "text",
+  "number",
+  "date",
+  "time",
+  "email",
+  "url",
+  "tel",
+  "multipleChoice",
+];
 
 const Page = () => {
-  const [form, setForm] = useState<Form>(initialState);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  // HANDLERS
-  function handleAddNewField() {
-    const newId = uuidv4();
-    const newField = {
-      id: newId,
-      question: "",
-    };
-    setForm((prevState) => {
-      return {
-        title: prevState.title,
-        formFields: [...prevState.formFields, newField],
-      };
-    });
-  }
-  function handleFormTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm((prevState) => {
-      return {
-        title: e.target.value,
-        formFields: prevState.formFields,
-      };
-    });
-  }
-  function handleFieldQuestionChange(
-    id: string | number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-    setForm((prevState) => {
-      const updatedFields = prevState.formFields.map((field) => {
-        if (field.id === id) {
-          return { ...field, question: e.target.value };
-        }
-        return field;
-      });
-      return {
-        title: prevState.title,
-        formFields: updatedFields,
-      };
-    });
-  }
-  function handleFieldAnswerTypeChange(
-    id: string | number,
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) {
-    setForm((prevState) => {
-      const updatedFields = prevState.formFields.map((field) => {
-        if (field.id === id) {
-          return { ...field, type: e.target.value };
-        }
-        return field;
-      });
-      return {
-        title: prevState.title,
-        formFields: updatedFields,
-      };
-    });
-  }
-  function handleFieldDelete(
-    id: string | number,
-    e: React.MouseEvent<HTMLButtonElement>
-  ) {
-    setForm((prevState) => {
-      const updatedFields = prevState.formFields.filter((field) => {
-        if (field.id === id) {
-          return false;
-        }
-        return true;
-      });
-      return {
-        title: prevState.title,
-        formFields: updatedFields,
-      };
-    });
-  }
-  function handleFieldDuplicate(id: string | number) {
-    const newId = uuidv4();
-    setForm((prevState) => {
-      const itemToDuplicate = prevState.formFields.find(
-        (field) => field.id === id
-      );
-      if (!itemToDuplicate) {
-        return prevState;
-      }
-      const newField = {
-        ...itemToDuplicate,
-        id: newId,
-      };
-      return {
-        title: prevState.title,
-        formFields: [...prevState.formFields, newField],
-      };
-    });
-  }
-  function handleFieldRequired(
-    id: string | number,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-    setForm((prevState) => {
-      const updatedFields = prevState.formFields.map((field) => {
-        if (field.id === id) {
-          return { ...field, required: e.target.checked };
-        }
-        return field;
-      });
-      return {
-        title: prevState.title,
-        formFields: updatedFields,
-      };
-    });
-  }
+
   return (
     <div>
-      {/* actions */}
-      <button onClick={() => setShowPreview(!showPreview)}>
-        {showPreview ? "Edit" : "Preview form"}
-      </button>
-      {showPreview ? (
-        <PreviewForm form={form} />
-      ) : (
-        <FormBuilder
-          form={form}
-          handleAddNewField={handleAddNewField}
-          handleFormTitleChange={handleFormTitleChange}
-          handleFieldAnswerTypeChange={handleFieldAnswerTypeChange}
-          handleFieldQuestionChange={handleFieldQuestionChange}
-          handleFieldDelete={handleFieldDelete}
-          handleFieldDuplicate={handleFieldDuplicate}
-          handleFieldRequired={handleFieldRequired}
-        />
-      )}
+      <FormBuilder />
     </div>
   );
 };
 
-interface FormBuilderProps {
-  form: Form;
-  handleAddNewField: () => void;
-  handleFormTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleFieldQuestionChange: (
-    id: string,
+const renderAnswer = (
+  field: FormField,
+  changeMultipleChoiceOption: (
+    fieldId: string,
+    optionId: string,
     e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
-  handleFieldAnswerTypeChange: (
-    id: string,
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => void;
-  handleFieldDelete: (
-    id: string,
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => void;
-  handleFieldDuplicate: (id: string) => void;
-  handleFieldRequired: (
-    id: string,
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => void;
-}
-const FormBuilder: React.FC<FormBuilderProps> = ({
-  form,
-  handleAddNewField,
-  handleFormTitleChange,
-  handleFieldQuestionChange,
-  handleFieldAnswerTypeChange,
-  handleFieldDelete,
-  handleFieldDuplicate,
-  handleFieldRequired,
-}) => {
+  ) => void,
+  addOption: (fieldId: string) => void
+) => {
+  if (
+    field.type === "text" ||
+    field.type === "number" ||
+    field.type === "date" ||
+    field.type === "time" ||
+    field.type === "email" ||
+    field.type === "url" ||
+    field.type === "tel"
+  ) {
+    return (
+      <input type={field.type} placeholder={`${field.type} answer`} disabled />
+    );
+  } else if (field.type === "multipleChoice") {
+    return (
+      <div>
+        {field.options.map((option) => {
+          return (
+            <div key={option.id} className="flex">
+              <Circle size={20} />
+              <input
+                type="text"
+                value={option.value}
+                onChange={(e) =>
+                  changeMultipleChoiceOption(field.id, option.id, e)
+                }
+              />
+            </div>
+          );
+        })}
+        <button onClick={() => addOption(field.id)}>add option</button>
+      </div>
+    );
+  }
+};
+
+const FormBuilder = () => {
+  const {
+    title,
+    formFields,
+    addNewField,
+    changeFieldAnswerType,
+    changeFieldQuestion,
+    changeFormTitle,
+    deleteField,
+    duplicateField,
+    toggleFieldRequired,
+    changeMultipleChoiceOption,
+    addOption,
+  } = useFormStore();
+  // console.log(useFormStore.getState());
   return (
     <div>
       {/* actions */}
-      <button onClick={handleAddNewField}>add new field</button>
+      <button onClick={addNewField}>add new field</button>
 
       {/* FORM TITLE */}
       <div>
@@ -189,35 +96,25 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
           name="form-title"
           id="form-title"
           type="text"
-          value={form.title}
-          onChange={handleFormTitleChange}
+          value={title}
+          onChange={changeFormTitle}
           placeholder="enter form title"
         />
       </div>
       {/* END OF FORM TITLE */}
       {/* FORM FIELDS */}
 
-      {form.formFields.map((field) => (
+      {formFields.map((field) => (
         <div key={field.id} className="p-10 bg-red-500">
-          <div>
-            <label htmlFor="field-question">Question</label>
-            <input
-              type="text"
-              id="field-question"
-              name="field-question"
-              value={field.question}
-              onChange={(e) => handleFieldQuestionChange(field.id, e)}
-              placeholder="enter question"
-            />
-          </div>
+          {/* CHOOSE ANS TYPE */}
           <div>
             <label htmlFor="field-answer-type">Answer type</label>
             <select
               name="field-answer-type"
               id="field-answer-type"
-              onChange={(e) => handleFieldAnswerTypeChange(field.id, e)}
+              value={field.type}
+              onChange={(e) => changeFieldAnswerType(field.id, e)}
             >
-              <option value={"text"}>select a type</option>
               {allowedAnswerTypes.map((type) => (
                 <option key={type} value={type}>
                   {type}
@@ -225,6 +122,25 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               ))}
             </select>
           </div>
+          {/* END OF CHOOSE ANS TYPE */}
+          {/* QUESTION */}
+          <div>
+            <label htmlFor="field-question">Question</label>
+            <input
+              type="text"
+              id="field-question"
+              name="field-question"
+              value={field.question}
+              onChange={(e) => changeFieldQuestion(field.id, e)}
+              placeholder="enter question"
+            />
+          </div>
+          {/* END OF QUESTION */}
+          {/* ANSWER */}
+          <div>
+            {renderAnswer(field, changeMultipleChoiceOption, addOption)}
+          </div>
+          {/* END OF ANSWER */}
           {/* actions */}
           <div>
             <div>
@@ -232,15 +148,12 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
               <input
                 id="field-required"
                 type="checkbox"
-                onChange={(e) => handleFieldRequired(field.id, e)}
+                checked={field.required}
+                onChange={(e) => toggleFieldRequired(field.id, e)}
               />
             </div>
-            <button onClick={(e) => handleFieldDelete(field.id, e)}>
-              delete
-            </button>
-            <button onClick={() => handleFieldDuplicate(field.id)}>
-              duplicate
-            </button>
+            <button onClick={() => deleteField(field.id)}>delete</button>
+            <button onClick={() => duplicateField(field.id)}>duplicate</button>
           </div>
         </div>
       ))}
@@ -248,36 +161,62 @@ const FormBuilder: React.FC<FormBuilderProps> = ({
     </div>
   );
 };
+// interface FormBuilderProps {
+//   form: Form;
+//   handleAddNewField: () => void;
+//   handleFormTitleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+//   handleFieldQuestionChange: (
+//     id: string,
+//     e: React.ChangeEvent<HTMLInputElement>
+//   ) => void;
+//   handleFieldAnswerTypeChange: (
+//     id: string,
+//     e: React.ChangeEvent<HTMLSelectElement>
+//   ) => void;
+//   handleFieldDelete: (
+//     id: string,
+//     e: React.MouseEvent<HTMLButtonElement>
+//   ) => void;
+//   handleFieldDuplicate: (id: string) => void;
+//   handleFieldRequired: (
+//     id: string,
+//     e: React.ChangeEvent<HTMLInputElement>
+//   ) => void;
+//   handleMultipleChoiceOptionChange: (
+//     fieldId: string,
+//     optionId: string,
+//     e: React.ChangeEvent<HTMLInputElement>
+//   ) => void;
+// }
+// interface PreviewFormProps {
+//   form: Form;
+// }
 
-interface PreviewFormProps {
-  form: Form;
-}
-
-const PreviewForm: React.FC<PreviewFormProps> = ({ form }) => {
-  return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        console.log(Object.fromEntries(formData));
-      }}
-    >
-      {/* FORM TITLE */}
-      <h1>{form.title}</h1>
-      {/* END OF FORM TITLE */}
-      {/* FORM FIELDS */}
-      {form.formFields.map((field) => {
-        return (
-          <div key={field.id}>
-            <label htmlFor={field.id}>{field.question}</label>
-            <input type={field.type} id={field.id} name={field.id} />
-          </div>
-        );
-      })}
-      {/*END OF FORM FIELDS */}
-      <button type="submit">Submit</button>
-    </form>
-  );
-};
+// const PreviewForm: React.FC<PreviewFormProps> = ({ form }) => {
+//   return (
+//     <form
+//       onSubmit={(e) => {
+//         e.preventDefault();
+//         const formData = new FormData(e.currentTarget);
+//         console.log(Object.fromEntries(formData));
+//       }}
+//     >
+//       {/* FORM TITLE */}
+//       <h1>{form.title}</h1>
+//       {/* END OF FORM TITLE */}
+//       {/* FORM FIELDS */}
+//       {form.formFields.map((field) => {
+//         return (
+//           <div key={field.id}>
+//             <label htmlFor={field.id}>{field.question}</label>
+//             <input type={field.type} id={field.id} name={field.id} />
+//           </div>
+//         );
+//       })}
+//       {/*END OF FORM FIELDS */}
+//       <button type="submit">Submit</button>
+//     </form>
+//   );
+// };
 
 export default Page;
