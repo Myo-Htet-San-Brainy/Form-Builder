@@ -1,4 +1,5 @@
 export interface BaseField {
+  id: string;
   question?: string;
   type: string;
   required?: boolean;
@@ -44,7 +45,7 @@ export type FormField = TextField | SelectField;
 
 export interface Form {
   title?: string;
-  formFields: Record<string, FormField>;
+  formFields: FormField[];
 }
 
 export type FieldTypes = TextField["type"] | SelectField["type"];

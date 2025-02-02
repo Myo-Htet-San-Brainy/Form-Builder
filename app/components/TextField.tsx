@@ -5,10 +5,12 @@ import FieldActions from "./FieldActions";
 
 const TextField: React.FC<{ fieldId: string }> = ({ fieldId }) => {
   return (
-    <div className="bg-sky-300">
-      <FieldChooseAnsType fieldId={fieldId} />
-      <FieldQuestion fieldId={fieldId} />
-      <input placeholder={`answer goes here`} disabled />;
+    <div className="px-5 py-5 flex flex-col gap-4 border border-slate-300 rounded-md">
+      <div className="flex flex-col md:flex-row gap-4">
+        <FieldQuestion fieldId={fieldId} />
+        <FieldChooseAnsType fieldId={fieldId} />
+      </div>
+      <input className="py-5 px-3" placeholder={`answer goes here`} disabled />
       <FieldActions fieldId={fieldId} />
     </div>
   );

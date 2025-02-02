@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
-import { Form, FieldTypes, isSelectField } from "../entities/form";
+import { Form, FieldTypes, isSelectField, FormField } from "../entities/form";
 import { convertFieldType } from "../utils/index";
 
 interface FormStore extends Form {
@@ -26,37 +26,113 @@ interface FormStore extends Form {
     e: React.ChangeEvent<HTMLInputElement>
   ) => void;
   addOption: (fieldId: string) => void;
+  // changeSmth: (activeId: number, overId: number) => void;
+  changeFieldsOrder: (activeId: string, overId: string, arrayMove: any) => void;
 }
 
 export const useFormStore = create<FormStore>((set) => ({
   // Initial state
-  formFields: {
-    [uuidv4()]: {
-      type: "text" as const,
-      question: "default question",
-      required: false,
-    },
-    [uuidv4()]: {
+  formFields: [
+    {
+      id: uuidv4(), // Add an `id` for each field
       type: "multipleChoice" as const,
-      options: [{ id: uuidv4(), value: "some option" }],
-      question: "default question",
+      options: [{ id: uuidv4(), value: "Default Option" }],
+      question: "Default Question",
       required: false,
     },
+  ],
+
+  title: "Default Title",
+
+  // changeSmth(activeId, overId) {
+  //   if (activeId !== overId) {
+  //     set((state) => {
+  //       if (activeId > overId) {
+  //         const copy: Record<string, FormField> = JSON.parse(
+  //           JSON.stringify(state.formFields)
+  //         );
+  //         const arrayCopy = Object.entries(copy);
+  //         const elementWithActiveId = arrayCopy.find(
+  //           (array) => array[1].order === activeId
+  //         );
+  //         const arrayWithoutActive = arrayCopy.filter(
+  //           (array) => array[1].order !== activeId
+  //         );
+  //         if (elementWithActiveId) {
+  //           elementWithActiveId[1].order = overId;
+  //         }
+  //         const updatedArray = arrayWithoutActive.map((element) => {
+  //           if (element[1].order >= overId && element[1].order < activeId) {
+  //             element[1].order -= 1;
+  //           }
+  //           return element;
+  //         });
+  //         if (elementWithActiveId) {
+  //           updatedArray.push(elementWithActiveId);
+  //         }
+  //         return {
+  //           ...state,
+  //           formFields: Object.fromEntries(updatedArray),
+  //         };
+  //       } else {
+  //         const copy: Record<string, FormField> = JSON.parse(
+  //           JSON.stringify(state.formFields)
+  //         );
+  //         const arrayCopy = Object.entries(copy);
+  //         const elementWithActiveId = arrayCopy.find(
+  //           (array) => array[1].order === activeId
+  //         );
+  //         const arrayWithoutActive = arrayCopy.filter(
+  //           (array) => array[1].order !== activeId
+  //         );
+  //         if (elementWithActiveId) {
+  //           elementWithActiveId[1].order = overId;
+  //         }
+  //         const updatedArray = arrayWithoutActive.map((element) => {
+  //           if (element[1].order <= overId && element[1].order > activeId) {
+  //             element[1].order -= 1;
+  //           }
+  //           return element;
+  //         });
+  //         if (elementWithActiveId) {
+  //           updatedArray.push(elementWithActiveId);
+  //         }
+  //         return {
+  //           ...state,
+  //           formFields: Object.fromEntries(updatedArray),
+  //         };
+  //       }
+  //     });
+  //   }
+  // },
+
+  changeFieldsOrder(activeId, overId, arrayMove) {
+    set((prev) => {
+      const ids = prev.formFields.map((formField) => formField.id);
+      const oldIndex = ids.indexOf(activeId);
+      const newIndex = ids.indexOf(overId);
+      // console.log(arrayMove(prev.formFields, oldIndex, newIndex));
+      return {
+        ...prev,
+        formFields: arrayMove(prev.formFields, oldIndex, newIndex),
+      };
+    });
   },
 
-  title: "default title",
-
   // Method to add a new field
+
   addNewField: () =>
     set((state) => {
-      const newId = uuidv4();
-      const newField = {
-        question: "",
-        type: "text" as const,
+      const newField: FormField = {
+        id: uuidv4(), // Add a unique ID for the new field
+        question: "", // Default question
+        type: "text", // Default type
+        required: false, // Default required status
       };
+
       return {
         ...state,
-        formFields: { ...state.formFields, [newId]: newField },
+        formFields: [...state.formFields, newField], // Add the new field to the array
       };
     }),
 
@@ -67,102 +143,96 @@ export const useFormStore = create<FormStore>((set) => ({
       title: e.target.value,
     })),
 
-  // Method to change field question
-  changeFieldQuestion: (id, e) =>
+  changeFieldQuestion: (id: string, e: React.ChangeEvent<HTMLInputElement>) =>
     set((state) => ({
       ...state,
-      formFields: {
-        ...state.formFields,
-        [id]: {
-          ...state.formFields[id],
-          question: e.target.value,
-        },
-      },
+      formFields: state.formFields.map(
+        (field) =>
+          field.id === id
+            ? { ...field, question: e.target.value } // Update the question for the matching field
+            : field // Leave other fields unchanged
+      ),
     })),
 
   // Method to change field answer type
-  changeFieldAnswerType: (id, e) =>
+  changeFieldAnswerType: (
+    id: string,
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) =>
     set((state) => ({
       ...state,
-      formFields: {
-        ...state.formFields,
-        [id]: convertFieldType(
-          state.formFields[id],
-          e.target.value as FieldTypes
-        ),
-      },
+      formFields: state.formFields.map((field) =>
+        field.id === id
+          ? convertFieldType(field, e.target.value as FieldTypes)
+          : field
+      ),
     })),
 
   // Method to delete a field
-  deleteField: (id) =>
-    set((state) => {
-      const { [id]: deletedField, ...rest } = state.formFields;
-      return {
-        ...state,
-        formFields: rest,
-      };
-    }),
+  deleteField: (id: string) =>
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.filter((field) => field.id !== id),
+    })),
 
   // Method to duplicate a field
-  duplicateField: (id) =>
+  duplicateField: (id: string) =>
     set((state) => {
-      const newId = uuidv4();
+      const fieldToDuplicate = state.formFields.find(
+        (field) => field.id === id
+      );
+      if (!fieldToDuplicate) return state; // If field doesn't exist, return state as is
+
+      const newField = { ...fieldToDuplicate, id: uuidv4() };
+
       return {
         ...state,
-        formFields: { ...state.formFields, [newId]: state.formFields[id] },
+        formFields: [...state.formFields, newField],
       };
     }),
 
   // Method to toggle field required status
-  toggleFieldRequired: (id, e) =>
-    set((state) => {
-      const field = state.formFields[id];
-      return {
-        ...state,
-        formFields: {
-          ...state.formFields,
-          [id]: { ...field, required: e.target.checked },
-        },
-      };
-    }),
+  toggleFieldRequired: (id: string, e: React.ChangeEvent<HTMLInputElement>) =>
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) =>
+        field.id === id ? { ...field, required: e.target.checked } : field
+      ),
+    })),
 
   // Method to change multiple choice option
-  changeOption: (fieldId, optionId, e) =>
-    set((state) => {
-      const field = state.formFields[fieldId];
-      return isSelectField(field)
-        ? {
-            ...state,
-            formFields: {
-              ...state.formFields,
-              [fieldId]: {
-                ...field,
-                options: field.options.map((option) =>
-                  option.id === optionId
-                    ? { ...option, value: e.target.value }
-                    : option
-                ),
-              },
-            },
-          }
-        : state;
-    }),
+  changeOption: (
+    fieldId: string,
+    optionId: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) =>
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) =>
+        field.id === fieldId && isSelectField(field)
+          ? {
+              ...field,
+              options: field.options.map((option) =>
+                option.id === optionId
+                  ? { ...option, value: e.target.value }
+                  : option
+              ),
+            }
+          : field
+      ),
+    })),
 
-  //Method to add new option
-  addOption: (fieldId) =>
-    set((state) => {
-      const field = state.formFields[fieldId];
-      return isSelectField(field)
-        ? {
-            ...state,
-            formFields: {
-              ...state.formFields,
-              [fieldId]: {
-                ...field,
-                options: [...field.options, { id: uuidv4(), value: "" }],
-              },
-            },
-          }
-        : state;
-    }),
+  // Method to add new option
+  addOption: (fieldId: string) =>
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) =>
+        field.id === fieldId && isSelectField(field)
+          ? {
+              ...field,
+              options: [...field.options, { id: uuidv4(), value: "" }],
+            }
+          : field
+      ),
+    })),
 }));

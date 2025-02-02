@@ -6,6 +6,7 @@ export function convertFieldType(
   newType: FieldTypes
 ): FormField {
   const baseFieldProperties = {
+    id: field.id,
     question: field.question,
     required: field.required,
   };

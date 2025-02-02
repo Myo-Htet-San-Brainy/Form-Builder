@@ -8,16 +8,18 @@ interface FieldActionsProps {
 const FieldActions: React.FC<FieldActionsProps> = ({ fieldId }) => {
   const { formFields, toggleFieldRequired, deleteField, duplicateField } =
     useFormStore();
-  const formField = formFields[fieldId];
+  const formField = formFields.find((field) => field.id === fieldId);
+
+  if (!formField) return null; // Handle case where field is not found
 
   return (
-    <div>
-      <div>
+    <div className="flex gap-2">
+      <div className="flex gap-1">
         <label htmlFor={`field-required-${fieldId}`}>Required</label>
         <input
           id={`field-required-${fieldId}`}
           type="checkbox"
-          checked={formField?.required}
+          checked={formField.required || false}
           onChange={(e) => toggleFieldRequired(fieldId, e)}
         />
       </div>
