@@ -40,6 +40,13 @@ export const useFormStore = create<FormStore>((set) => ({
       question: "Default Question",
       required: false,
     },
+    {
+      id: uuidv4(), // Add an `id` for each field
+      type: "multipleChoice" as const,
+      options: [{ id: uuidv4(), value: "Default Option" }],
+      question: "Default Question",
+      required: false,
+    },
   ],
 
   title: "Default Title",
@@ -143,7 +150,9 @@ export const useFormStore = create<FormStore>((set) => ({
       title: e.target.value,
     })),
 
-  changeFieldQuestion: (id: string, e: React.ChangeEvent<HTMLInputElement>) =>
+  changeFieldQuestion: (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("change field q");
+
     set((state) => ({
       ...state,
       formFields: state.formFields.map(
@@ -152,7 +161,8 @@ export const useFormStore = create<FormStore>((set) => ({
             ? { ...field, question: e.target.value } // Update the question for the matching field
             : field // Leave other fields unchanged
       ),
-    })),
+    }));
+  },
 
   // Method to change field answer type
   changeFieldAnswerType: (
@@ -167,7 +177,6 @@ export const useFormStore = create<FormStore>((set) => ({
           : field
       ),
     })),
-
   // Method to delete a field
   deleteField: (id: string) =>
     set((state) => ({

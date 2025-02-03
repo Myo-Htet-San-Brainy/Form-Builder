@@ -40,11 +40,23 @@ const Page = () => {
   );
 };
 
-const renderField = (field: FormField) => {
+const renderField = (field: FormField, attributes: any, listeners: any) => {
   if (isTextField(field)) {
-    return <TextField fieldId={field.id} />;
+    return (
+      <TextField
+        fieldId={field.id}
+        listeners={listeners}
+        attributes={attributes}
+      />
+    );
   } else if (isSelectField(field)) {
-    return <SelectField fieldId={field.id} />;
+    return (
+      <SelectField
+        fieldId={field.id}
+        listeners={listeners}
+        attributes={attributes}
+      />
+    );
   }
 };
 
@@ -61,7 +73,8 @@ const FormBuilder = () => {
   );
 
   function handleDragEnd(e: any) {
-    // console.log(e);
+    console.log(e);
+    // e.stopPropagation();
     const activeId = e.active.id;
     const overId = e.over.id;
     if (activeId !== overId) {
@@ -89,8 +102,9 @@ const FormBuilder = () => {
       </div>
       {/* END OF FORM TITLE */}
       {/* FORM FIELDS */}
+
       <DndContext
-        sensors={sensors}
+        // sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
       >
@@ -109,14 +123,9 @@ const FormBuilder = () => {
                 style: any
               ) => {
                 return (
-                  <button
-                    style={style}
-                    {...attributes}
-                    {...listeners}
-                    ref={setNodeRef}
-                  >
-                    {renderField(field)}
-                  </button>
+                  <div style={style} ref={setNodeRef}>
+                    {renderField(field, attributes, listeners)}
+                  </div>
                 );
               }}
             />
@@ -126,9 +135,11 @@ const FormBuilder = () => {
 
       {/*END OF FORM FIELDS */}
       {/* actions */}
-      <button onClick={addNewField} className="w-32 btn bg-black text-white">
-        add new field
-      </button>
+      <div className="flex justify-end">
+        <button onClick={addNewField} className="w-32 btn bg-black text-white">
+          add new field
+        </button>
+      </div>
     </div>
   );
 };
