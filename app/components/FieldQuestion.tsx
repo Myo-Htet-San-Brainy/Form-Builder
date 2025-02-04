@@ -15,7 +15,7 @@ const FieldQuestion: React.FC<{ fieldId: string }> = ({ fieldId }) => {
       value={formField.question || ""}
       onChange={(e) => changeFieldQuestion(fieldId, e)}
       placeholder="Enter question"
-      className="grow font-medium text-2xl border-b-2 border-slate-400 focus:border-black focus:border-b-[3px] outline-none transition-all duration-200 caret-black"
+      className=" grow font-medium text-xl md:text-2xl border-b-2 border-slate-400 focus:border-black focus:border-b-[3px] outline-none transition-all duration-200 caret-black"
     />
   );
 };

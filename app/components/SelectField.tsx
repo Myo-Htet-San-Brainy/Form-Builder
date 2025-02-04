@@ -5,6 +5,7 @@ import FieldActions from "./FieldActions";
 import { useFormStore } from "../lib/formStore";
 import { Circle } from "lucide-react";
 import { SelectField as SelectFieldType } from "../entities/form";
+import FieldAddImage from "./FieldAddImage";
 
 const SelectField: React.FC<{
   fieldId: string;
@@ -25,6 +26,8 @@ const SelectField: React.FC<{
           <FieldQuestion fieldId={fieldId} />
           <FieldChooseAnsType fieldId={fieldId} />
         </div>
+        <FieldAddImage fieldId={fieldId} />
+
         <div className="flex flex-col gap-3 items-start">
           {formField.options.map((option) => (
             <div key={option.id} className="flex items-center gap-2">
@@ -43,7 +46,7 @@ const SelectField: React.FC<{
         <FieldActions fieldId={fieldId} />
       </div>
       <div
-        className="flex items-center cursor-grab p-2 bg-gray-200 rounded-md"
+        className="self-center flex items-center cursor-grab p-2 bg-gray-200 rounded-md"
         {...listeners}
         {...attributes}
       >

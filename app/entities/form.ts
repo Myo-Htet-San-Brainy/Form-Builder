@@ -3,6 +3,7 @@ export interface BaseField {
   question?: string;
   type: string;
   required?: boolean;
+  inlineImg?: File;
 }
 
 interface TextField extends BaseField {
@@ -46,6 +47,7 @@ export type FormField = TextField | SelectField;
 export interface Form {
   title?: string;
   formFields: FormField[];
+  currentSelectedField?: string;
 }
 
 export type FieldTypes = TextField["type"] | SelectField["type"];

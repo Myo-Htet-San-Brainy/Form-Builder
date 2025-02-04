@@ -28,6 +28,9 @@ interface FormStore extends Form {
   addOption: (fieldId: string) => void;
   // changeSmth: (activeId: number, overId: number) => void;
   changeFieldsOrder: (activeId: string, overId: string, arrayMove: any) => void;
+  changeFieldInlineImg: (fieldId: string, imgFile: File) => void;
+  removeFieldInlineImg: (fieldId: string) => void;
+  changeCurrentSelectedField: (fieldId: string) => void;
 }
 
 export const useFormStore = create<FormStore>((set) => ({
@@ -50,68 +53,44 @@ export const useFormStore = create<FormStore>((set) => ({
   ],
 
   title: "Default Title",
+  removeFieldInlineImg(fieldId) {
+    console.log(fieldId);
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) => {
+        if (field.id === fieldId) {
+          return { ...field, inlineImg: undefined };
+        } else {
+          return field;
+        }
+      }),
+    }));
+  },
 
-  // changeSmth(activeId, overId) {
-  //   if (activeId !== overId) {
-  //     set((state) => {
-  //       if (activeId > overId) {
-  //         const copy: Record<string, FormField> = JSON.parse(
-  //           JSON.stringify(state.formFields)
-  //         );
-  //         const arrayCopy = Object.entries(copy);
-  //         const elementWithActiveId = arrayCopy.find(
-  //           (array) => array[1].order === activeId
-  //         );
-  //         const arrayWithoutActive = arrayCopy.filter(
-  //           (array) => array[1].order !== activeId
-  //         );
-  //         if (elementWithActiveId) {
-  //           elementWithActiveId[1].order = overId;
-  //         }
-  //         const updatedArray = arrayWithoutActive.map((element) => {
-  //           if (element[1].order >= overId && element[1].order < activeId) {
-  //             element[1].order -= 1;
-  //           }
-  //           return element;
-  //         });
-  //         if (elementWithActiveId) {
-  //           updatedArray.push(elementWithActiveId);
-  //         }
-  //         return {
-  //           ...state,
-  //           formFields: Object.fromEntries(updatedArray),
-  //         };
-  //       } else {
-  //         const copy: Record<string, FormField> = JSON.parse(
-  //           JSON.stringify(state.formFields)
-  //         );
-  //         const arrayCopy = Object.entries(copy);
-  //         const elementWithActiveId = arrayCopy.find(
-  //           (array) => array[1].order === activeId
-  //         );
-  //         const arrayWithoutActive = arrayCopy.filter(
-  //           (array) => array[1].order !== activeId
-  //         );
-  //         if (elementWithActiveId) {
-  //           elementWithActiveId[1].order = overId;
-  //         }
-  //         const updatedArray = arrayWithoutActive.map((element) => {
-  //           if (element[1].order <= overId && element[1].order > activeId) {
-  //             element[1].order -= 1;
-  //           }
-  //           return element;
-  //         });
-  //         if (elementWithActiveId) {
-  //           updatedArray.push(elementWithActiveId);
-  //         }
-  //         return {
-  //           ...state,
-  //           formFields: Object.fromEntries(updatedArray),
-  //         };
-  //       }
-  //     });
-  //   }
-  // },
+  changeCurrentSelectedField(fieldId) {
+    set((state) => ({
+      ...state,
+      currentSelectedField: fieldId,
+    }));
+  },
+
+  changeFieldInlineImg(fieldId, imgFile) {
+    console.log("inside change");
+    console.log("inside change, file", imgFile);
+    console.log("inside change, fieldId", fieldId);
+
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) => {
+        if (field.id === fieldId) {
+          console.log("equal");
+          return { ...field, inlineImg: imgFile };
+        } else {
+          return field;
+        }
+      }),
+    }));
+  },
 
   changeFieldsOrder(activeId, overId, arrayMove) {
     set((prev) => {
@@ -151,8 +130,6 @@ export const useFormStore = create<FormStore>((set) => ({
     })),
 
   changeFieldQuestion: (id: string, e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("change field q");
-
     set((state) => ({
       ...state,
       formFields: state.formFields.map(

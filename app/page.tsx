@@ -5,6 +5,7 @@ import { useFormStore } from "./lib/formStore";
 import PreviewForm from "./components/PreviewForm";
 import TextField from "./components/TextField";
 import SelectField from "./components/SelectField";
+import { clsx } from "clsx";
 import {
   DndContext,
   closestCenter,
@@ -20,6 +21,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import SortableItem from "./components/SortableItem";
+import Droppable from "./components/Droppable";
 
 const Page = () => {
   const [showPreview, setShowPreview] = useState<boolean>(false);
@@ -61,9 +63,17 @@ const renderField = (field: FormField, attributes: any, listeners: any) => {
 };
 
 const FormBuilder = () => {
-  const { title, formFields, addNewField, changeFormTitle, changeFieldsOrder } =
-    useFormStore();
-  // console.log(useFormStore.getState());
+  const [isFileDragging, setIsFileDragging] = useState(false);
+  const {
+    title,
+    formFields,
+    addNewField,
+    changeFormTitle,
+    changeFieldsOrder,
+    changeFieldInlineImg,
+    currentSelectedField,
+  } = useFormStore();
+  console.log(useFormStore.getState());
   // console.log(formFieldsArray);
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -80,11 +90,40 @@ const FormBuilder = () => {
     if (activeId !== overId) {
       changeFieldsOrder(activeId, overId, arrayMove);
     }
-    // changeSmth(activeId, overId);
   }
 
   return (
-    <div className="px-10 md:px-20 flex flex-col gap-4">
+    <div
+      className={"px-10 md:px-20 flex flex-col gap-4"}
+      onDragOver={(e) => setIsFileDragging(true)}
+    >
+      {/* Image File Drop Overlay */}
+      <div
+        className={clsx(
+          "fixed z-10 inset-0 bg-sky-300 bg-opacity-50 backdrop-blur-md transition-opacity duration-200 items-center justify-center text-2xl text-white",
+          {
+            hidden: !isFileDragging,
+            flex: isFileDragging,
+          }
+        )}
+        onDragLeave={(e) => setIsFileDragging(false)}
+        onDragOver={(e) => {
+          e.preventDefault();
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          console.log("drop e", e);
+          const file = e.dataTransfer.files[0];
+          setIsFileDragging(false);
+          changeFieldInlineImg(currentSelectedField!, file);
+        }}
+      >
+        <div className="flex flex-col items-center justify-center">
+          <p>Drop your image here.</p>
+          <p>Image File</p>
+          <p>Less than 5MB</p>
+        </div>
+      </div>
       {/* FORM TITLE */}
       <div className="px-5 py-5 flex flex-col gap-4 border border-slate-300 rounded-md">
         <label htmlFor="form-title" className="font-medium text-2xl">
@@ -143,6 +182,21 @@ const FormBuilder = () => {
     </div>
   );
 };
+
+// function droppableRender(
+//   field: FormField,
+//   fieldId: string,
+//   isOver: boolean,
+//   setNodeRef: (element: HTMLElement | null) => void
+// ): React.ReactNode {
+//   return (
+//     <div
+//       ref={setNodeRef}
+//       className={clsx({ "bg-sky-300": isOver })}
+//       onDragOver={() => console.log("drag over")}
+//     ></div>
+//   );
+// }
 // interface FormBuilderProps {
 //   form: Form;
 //   handleAddNewField: () => void;

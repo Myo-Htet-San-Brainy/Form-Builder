@@ -9,6 +9,7 @@ export function convertFieldType(
     id: field.id,
     question: field.question,
     required: field.required,
+    inlineImg: field.inlineImg,
   };
 
   // Mapping of type-specific transformations

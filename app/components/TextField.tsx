@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import FieldChooseAnsType from "./FieldChooseAnsType";
 import FieldQuestion from "./FieldQuestion";
 import FieldActions from "./FieldActions";
+import FieldAddImage from "./FieldAddImage";
+import { clsx } from "clsx";
 
 const TextField: React.FC<{
   fieldId: string;
@@ -9,13 +11,18 @@ const TextField: React.FC<{
   attributes: any;
 }> = ({ fieldId, listeners, attributes }) => {
   return (
-    <div className="flex gap-3 px-5 py-5 border border-slate-300 rounded-md">
+    <div
+      className={"flex gap-3 px-5 py-5 border border-slate-300 rounded-md "}
+      // id={fieldId}
+
+      // onDragLeave={(e) => setIsFileDragging(false)}
+    >
       <div className="grow flex flex-col gap-4 ">
         <div className="flex flex-col md:flex-row gap-4">
           <FieldQuestion fieldId={fieldId} />
           <FieldChooseAnsType fieldId={fieldId} />
         </div>
-
+        <FieldAddImage fieldId={fieldId} />
         <input
           className="py-5 px-3"
           placeholder={`answer goes here`}

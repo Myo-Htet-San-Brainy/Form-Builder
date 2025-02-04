@@ -7,6 +7,7 @@ const SortableItem = ({ id, render }) => {
     useSortable({
       id,
     });
+
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
