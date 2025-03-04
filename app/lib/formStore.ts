@@ -33,7 +33,7 @@ interface FormStore extends Form {
   changeCurrentSelectedField: (fieldId: string) => void;
   changeCorrectAnswer: (fieldId: string, newCorrectAnsVal: any) => void;
   removeOption: (fieldId: string, optionId: string) => void;
-
+  updateCurrentQuizId: (quizId: string) => void;
   handleError: (key: any, errorMsg: string) => void;
   removeAllErrors: () => void;
 }
@@ -80,6 +80,14 @@ export const useFormStore = create<FormStore>((set) => ({
 
   title: "Default Title",
   errors: [],
+  updateCurrentQuizId(quizId) {
+    set((state) => {
+      return {
+        ...state,
+        currentQuizId: quizId,
+      };
+    });
+  },
   removeAllErrors() {
     set((state) => {
       return {

@@ -66,6 +66,7 @@ export interface Form {
   formFields: FormField[];
   currentSelectedField?: string;
   errors: FormError[];
+  currentQuizId?: string;
 }
 
 export type FieldType =

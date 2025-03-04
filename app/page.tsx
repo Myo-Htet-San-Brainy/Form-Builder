@@ -32,10 +32,21 @@ import Droppable from "./components/Droppable";
 import MatchField from "./components/MatchField";
 import { z } from "zod";
 import { mainSchema } from "./schema/formBuilderSchema";
+import toast from "react-hot-toast";
+import LinkSharePopup from "./components/CopyLink";
+import { idToLink } from "./utils";
 
 const Page = () => {
-  const { formFields, title, errors, handleError, removeAllErrors } =
-    useFormStore();
+  const [showCopyLink, setShowCopyLink] = useState(false);
+  const {
+    formFields,
+    title,
+    handleError,
+    removeAllErrors,
+    errors,
+    updateCurrentQuizId,
+    currentQuizId,
+  } = useFormStore();
 
   useEffect(() => {
     //remove current errors
@@ -57,17 +68,51 @@ const Page = () => {
       });
     }
   }, [formFields, title]);
-  function handlePublish() {
-    //sent to serer and generate link etc.
+
+  async function handlePublish() {
+    //if any err, fix err first
+    if (errors.length > 0) {
+      toast.error("Please fix errors first before publishing.");
+      return;
+    }
+    //make api call(loading, err), get the id, make the link, show the link
+    const res = await fetch("http://localhost:3000/api", {
+      method: "POST",
+      body: JSON.stringify({ title, quizFields: formFields }),
+    });
+    const jsonRes = await res.json();
+    //if not 201, toast err msg
+    if (res.status !== 201) {
+      toast.error(jsonRes.error);
+      return;
+    }
+    //if 201, update state with id
+    updateCurrentQuizId(jsonRes.data.insertedId);
+    toast.success("Quiz created successfully.");
   }
 
   return (
     <div>
+      {showCopyLink && (
+        <LinkSharePopup
+          link={idToLink(currentQuizId as string)}
+          onClose={() => setShowCopyLink(false)}
+        />
+      )}
       <div className="px-5 py-5 flex justify-between gap-4">
         <h1 className="font-bold text-xl">Quiz Builder</h1>
-        <button className=" btn bg-black text-white " onClick={handlePublish}>
-          Publish
-        </button>
+        {currentQuizId ? (
+          <button
+            className=" btn bg-black text-white "
+            onClick={() => setShowCopyLink(true)}
+          >
+            Get quiz link
+          </button>
+        ) : (
+          <button className=" btn bg-black text-white " onClick={handlePublish}>
+            Publish
+          </button>
+        )}
       </div>
       <FormBuilder />
     </div>
@@ -112,12 +157,12 @@ const FormBuilder = () => {
   } = useFormStore();
   console.log(useFormStore.getState());
   // console.log(formFieldsArray);
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  // const sensors = useSensors(
+  //   useSensor(PointerSensor),
+  //   useSensor(KeyboardSensor, {
+  //     coordinateGetter: sortableKeyboardCoordinates,
+  //   })
+  // );
 
   function handleDragEnd(e: any) {
     console.log(e);
