@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
-import { Form, FieldTypes, isSelectField, FormField } from "../entities/form";
+import { Form, FieldType, isSelectField, FormField } from "../entities/form";
 import { convertFieldType } from "../utils/index";
 
 interface FormStore extends Form {
@@ -31,6 +31,11 @@ interface FormStore extends Form {
   changeFieldInlineImg: (fieldId: string, imgFile: File) => void;
   removeFieldInlineImg: (fieldId: string) => void;
   changeCurrentSelectedField: (fieldId: string) => void;
+  changeCorrectAnswer: (fieldId: string, newCorrectAnsVal: any) => void;
+  removeOption: (fieldId: string, optionId: string) => void;
+
+  handleError: (key: any, errorMsg: string) => void;
+  removeAllErrors: () => void;
 }
 
 export const useFormStore = create<FormStore>((set) => ({
@@ -41,18 +46,107 @@ export const useFormStore = create<FormStore>((set) => ({
       type: "multipleChoice" as const,
       options: [{ id: uuidv4(), value: "Default Option" }],
       question: "Default Question",
-      required: false,
+      correctAnswer: "",
     },
     {
       id: uuidv4(), // Add an `id` for each field
-      type: "multipleChoice" as const,
-      options: [{ id: uuidv4(), value: "Default Option" }],
+      type: "fillInBlank" as const,
       question: "Default Question",
-      required: false,
+      correctAnswer: "",
+    },
+    {
+      id: uuidv4(), // Add an `id` for each field
+      type: "match" as const,
+      question: "Default Question",
+      correctAnswer: [
+        {
+          id: uuidv4(),
+          prompt: "",
+          description: "",
+        },
+        {
+          id: uuidv4(),
+          prompt: "",
+          description: "",
+        },
+        {
+          id: uuidv4(),
+          prompt: "",
+          description: "",
+        },
+      ],
     },
   ],
 
   title: "Default Title",
+  errors: [],
+  removeAllErrors() {
+    set((state) => {
+      return {
+        ...state,
+        errors: [],
+      };
+    });
+  },
+  handleError(key, errorMsg) {
+    set((state) => {
+      const isErrorAlreadyExisted = Boolean(
+        state.errors.find((error) => error.key === key)
+      );
+      if (isErrorAlreadyExisted) {
+        return {
+          ...state,
+          errors: state.errors.map((error) => {
+            if (error.key === key) {
+              return {
+                ...error,
+                errors: [...error.errors, errorMsg],
+              };
+            }
+            return error;
+          }),
+        };
+      } else {
+        return {
+          ...state,
+          errors: [...state.errors, { key: key, errors: [errorMsg] }],
+        };
+      }
+    });
+  },
+
+  // addFormError(error) {
+  //   set((state) => {
+  //     return {
+  //       ...state,
+  //       formErrors: [...state.formErrors, error],
+  //     };
+  //   });
+  // },
+  // addFieldError(fieldId, error) {
+  //   set((state) => ({
+  //     ...state,
+  //     formFields: state.formFields.map((field) => {
+  //       if (field.id === fieldId) {
+  //         return { ...field, errors: [...field.errors, error] };
+  //       } else {
+  //         return field;
+  //       }
+  //     }),
+  //   }));
+  // },
+  changeCorrectAnswer(fieldId, newCorrectAnsVal) {
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) => {
+        if (field.id === fieldId) {
+          return { ...field, correctAnswer: newCorrectAnsVal };
+        } else {
+          return field;
+        }
+      }),
+    }));
+  },
   removeFieldInlineImg(fieldId) {
     console.log(fieldId);
     set((state) => ({
@@ -113,7 +207,7 @@ export const useFormStore = create<FormStore>((set) => ({
         id: uuidv4(), // Add a unique ID for the new field
         question: "", // Default question
         type: "text", // Default type
-        required: false, // Default required status
+        correctAnswer: "",
       };
 
       return {
@@ -150,7 +244,7 @@ export const useFormStore = create<FormStore>((set) => ({
       ...state,
       formFields: state.formFields.map((field) =>
         field.id === id
-          ? convertFieldType(field, e.target.value as FieldTypes)
+          ? convertFieldType(field, e.target.value as FieldType)
           : field
       ),
     })),
@@ -185,6 +279,21 @@ export const useFormStore = create<FormStore>((set) => ({
         field.id === id ? { ...field, required: e.target.checked } : field
       ),
     })),
+
+  //
+  removeOption: (fieldId, optionId) => {
+    set((state) => ({
+      ...state,
+      formFields: state.formFields.map((field) =>
+        field.id === fieldId && isSelectField(field)
+          ? {
+              ...field,
+              options: field.options.filter((option) => option.id !== optionId),
+            }
+          : field
+      ),
+    }));
+  },
 
   // Method to change multiple choice option
   changeOption: (

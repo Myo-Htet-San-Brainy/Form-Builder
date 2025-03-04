@@ -1,20 +1,17 @@
 import React from "react";
 import { useFormStore } from "../lib/formStore";
+import { FormField } from "../entities/form";
 
 interface FieldActionsProps {
-  fieldId: string;
+  field: FormField;
 }
 
-const FieldActions: React.FC<FieldActionsProps> = ({ fieldId }) => {
-  const { formFields, toggleFieldRequired, deleteField, duplicateField } =
-    useFormStore();
-  const formField = formFields.find((field) => field.id === fieldId);
-
-  if (!formField) return null; // Handle case where field is not found
+const FieldActions: React.FC<FieldActionsProps> = ({ field }) => {
+  const { toggleFieldRequired, deleteField, duplicateField } = useFormStore();
 
   return (
     <div className="flex gap-2">
-      <div className="flex gap-1">
+      {/* <div className="flex gap-1">
         <label htmlFor={`field-required-${fieldId}`}>Required</label>
         <input
           id={`field-required-${fieldId}`}
@@ -22,9 +19,9 @@ const FieldActions: React.FC<FieldActionsProps> = ({ fieldId }) => {
           checked={formField.required || false}
           onChange={(e) => toggleFieldRequired(fieldId, e)}
         />
-      </div>
-      <button onClick={() => deleteField(fieldId)}>Delete</button>
-      <button onClick={() => duplicateField(fieldId)}>Duplicate</button>
+      </div> */}
+      <button onClick={() => deleteField(field.id)}>Delete</button>
+      <button onClick={() => duplicateField(field.id)}>Duplicate</button>
     </div>
   );
 };

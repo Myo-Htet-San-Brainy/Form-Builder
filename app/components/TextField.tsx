@@ -4,12 +4,22 @@ import FieldQuestion from "./FieldQuestion";
 import FieldActions from "./FieldActions";
 import FieldAddImage from "./FieldAddImage";
 import { clsx } from "clsx";
+import { useFormStore } from "../lib/formStore";
+import { TextField as TextFieldType, FillInBlankField } from "../entities/form";
 
 const TextField: React.FC<{
-  fieldId: string;
+  field: TextFieldType | FillInBlankField;
   listeners: any;
   attributes: any;
-}> = ({ fieldId, listeners, attributes }) => {
+}> = ({ field, listeners, attributes }) => {
+  const { changeCorrectAnswer } = useFormStore();
+
+  function handleTextFieldCorrectAnsChange(
+    e: React.ChangeEvent<HTMLInputElement>
+  ) {
+    const newVal = e.currentTarget.value;
+    changeCorrectAnswer(field.id, newVal);
+  }
   return (
     <div
       className={"flex gap-3 px-5 py-5 border border-slate-300 rounded-md "}
@@ -19,19 +29,20 @@ const TextField: React.FC<{
     >
       <div className="grow flex flex-col gap-4 ">
         <div className="flex flex-col md:flex-row gap-4">
-          <FieldQuestion fieldId={fieldId} />
-          <FieldChooseAnsType fieldId={fieldId} />
+          <FieldQuestion field={field} />
+          <FieldChooseAnsType field={field} />
         </div>
-        <FieldAddImage fieldId={fieldId} />
+        <FieldAddImage field={field} />
         <input
           className="py-5 px-3"
-          placeholder={`answer goes here`}
-          disabled
+          placeholder={`correct answer`}
+          value={field.correctAnswer}
+          onChange={handleTextFieldCorrectAnsChange}
         />
-        <FieldActions fieldId={fieldId} />
+        <FieldActions field={field} />
       </div>
       <div
-        className="flex items-center cursor-grab p-2 bg-gray-200 rounded-md"
+        className="self-center w-8 h-20 flex items-center justify-center cursor-grab p-2 bg-gray-200 rounded-md"
         {...listeners}
         {...attributes}
       >

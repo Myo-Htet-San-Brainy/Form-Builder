@@ -2,27 +2,26 @@ import React, { ChangeEvent, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import { useFormStore } from "../lib/formStore";
 import Image from "next/image";
+import { FormField } from "../entities/form";
 
-const FieldAddImage: React.FC<{ fieldId: string }> = ({ fieldId }) => {
+const FieldAddImage: React.FC<{ field: FormField }> = ({ field }) => {
   const [err, setErr] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>();
   const {
     changeFieldInlineImg,
-    formFields,
     removeFieldInlineImg,
     changeCurrentSelectedField,
   } = useFormStore();
 
-  const formField = formFields.find((field) => field.id === fieldId);
   useEffect(() => {
-    if (formField?.inlineImg) {
+    if (field?.inlineImg) {
       const reader = new FileReader();
       reader.onload = () => setPreviewUrl(reader.result as string);
-      reader.readAsDataURL(formField?.inlineImg);
+      reader.readAsDataURL(field?.inlineImg);
     } else {
       setPreviewUrl(undefined);
     }
-  }, [formField?.inlineImg]);
+  }, [field?.inlineImg]);
 
   // if (formField.inlineImg) {
   //   const reader = new FileReader();
@@ -50,7 +49,7 @@ const FieldAddImage: React.FC<{ fieldId: string }> = ({ fieldId }) => {
     // setErr(null);
 
     //set formStore state
-    changeFieldInlineImg(fieldId, file);
+    changeFieldInlineImg(field.id, file);
 
     // const reader = new FileReader();
     // reader.onload = () => setPreviewUrl(reader.result as string);
@@ -58,7 +57,7 @@ const FieldAddImage: React.FC<{ fieldId: string }> = ({ fieldId }) => {
   }
 
   function handleRemoveImg() {
-    removeFieldInlineImg(fieldId);
+    removeFieldInlineImg(field.id);
   }
   return (
     <div>
@@ -71,7 +70,7 @@ const FieldAddImage: React.FC<{ fieldId: string }> = ({ fieldId }) => {
             type="file"
             accept="image/*"
             hidden
-            onClick={() => changeCurrentSelectedField(fieldId)}
+            onClick={() => changeCurrentSelectedField(field.id)}
             onChange={(e) => handleChange(e)}
           />
         </label>

@@ -1,11 +1,18 @@
 "use client";
-import React, { useState } from "react";
-import { FormField, isSelectField, isTextField } from "./entities/form";
+import React, { useEffect, useState } from "react";
+import {
+  FormField,
+  isFillInBlankField,
+  isMatchField,
+  isSelectField,
+  isTextField,
+} from "./entities/form";
 import { useFormStore } from "./lib/formStore";
 import PreviewForm from "./components/PreviewForm";
 import TextField from "./components/TextField";
 import SelectField from "./components/SelectField";
 import { clsx } from "clsx";
+import { isEqual } from "lodash";
 import {
   DndContext,
   closestCenter,
@@ -22,22 +29,47 @@ import {
 } from "@dnd-kit/sortable";
 import SortableItem from "./components/SortableItem";
 import Droppable from "./components/Droppable";
+import MatchField from "./components/MatchField";
+import { z } from "zod";
+import { mainSchema } from "./schema/formBuilderSchema";
 
 const Page = () => {
-  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const { formFields, title, errors, handleError, removeAllErrors } =
+    useFormStore();
+
+  useEffect(() => {
+    //remove current errors
+    removeAllErrors();
+    //validation > stop the whole process & show errors at the right place and un-show on fix
+    const result = mainSchema.safeParse({ title, quizFields: formFields });
+    // console.log(result.error?.issues);
+    if (!result.success) {
+      result.error.issues.forEach((issue) => {
+        if (
+          issue.path[0] === "quizFields" &&
+          typeof issue.path[1] === "number"
+        ) {
+          handleError(issue.path[1], issue.message);
+        } else {
+          // isMsgAlreadyExisted(issue.message, formErrors) ||
+          handleError(issue.path[0], issue.message);
+        }
+      });
+    }
+  }, [formFields, title]);
+  function handlePublish() {
+    //sent to serer and generate link etc.
+  }
 
   return (
     <div>
       <div className="px-5 py-5 flex justify-between gap-4">
-        <h1 className="font-bold text-xl">Form Builder</h1>
-        <button
-          className=" btn bg-black text-white "
-          onClick={() => setShowPreview(!showPreview)}
-        >
-          show/stop preview
+        <h1 className="font-bold text-xl">Quiz Builder</h1>
+        <button className=" btn bg-black text-white " onClick={handlePublish}>
+          Publish
         </button>
       </div>
-      <div>{showPreview ? <PreviewForm /> : <FormBuilder />}</div>
+      <FormBuilder />
     </div>
   );
 };
@@ -45,19 +77,23 @@ const Page = () => {
 const renderField = (field: FormField, attributes: any, listeners: any) => {
   if (isTextField(field)) {
     return (
-      <TextField
-        fieldId={field.id}
-        listeners={listeners}
-        attributes={attributes}
-      />
+      <TextField field={field} listeners={listeners} attributes={attributes} />
     );
   } else if (isSelectField(field)) {
     return (
       <SelectField
-        fieldId={field.id}
+        field={field}
         listeners={listeners}
         attributes={attributes}
       />
+    );
+  } else if (isFillInBlankField(field)) {
+    return (
+      <TextField field={field} listeners={listeners} attributes={attributes} />
+    );
+  } else if (isMatchField(field)) {
+    return (
+      <MatchField field={field} listeners={listeners} attributes={attributes} />
     );
   }
 };
@@ -67,6 +103,7 @@ const FormBuilder = () => {
   const {
     title,
     formFields,
+    errors,
     addNewField,
     changeFormTitle,
     changeFieldsOrder,
@@ -124,6 +161,14 @@ const FormBuilder = () => {
           <p>Less than 5MB</p>
         </div>
       </div>
+      {/* FORM ERRORS */}
+      <ul className="text-red-500 list-disc">
+        {errors.map((error) => {
+          if (typeof error.key !== "number") {
+            return error.errors.map((msg, index) => <li key={index}>{msg}</li>);
+          }
+        })}
+      </ul>
       {/* FORM TITLE */}
       <div className="px-5 py-5 flex flex-col gap-4 border border-slate-300 rounded-md">
         <label htmlFor="form-title" className="font-medium text-2xl">
@@ -151,7 +196,7 @@ const FormBuilder = () => {
           items={formFields}
           strategy={verticalListSortingStrategy}
         >
-          {formFields.map((field) => (
+          {formFields.map((field, index) => (
             <SortableItem
               key={field.id}
               id={field.id}
@@ -164,6 +209,18 @@ const FormBuilder = () => {
                 return (
                   <div style={style} ref={setNodeRef}>
                     {renderField(field, attributes, listeners)}
+                    <ul className="text-red-500 list-disc">
+                      {errors.map((error) => {
+                        if (
+                          typeof error.key === "number" &&
+                          error.key === index
+                        ) {
+                          return error.errors.map((msg, index) => (
+                            <li key={index}>{msg}</li>
+                          ));
+                        }
+                      })}
+                    </ul>
                   </div>
                 );
               }}

@@ -6,47 +6,66 @@ import { useFormStore } from "../lib/formStore";
 import { Circle } from "lucide-react";
 import { SelectField as SelectFieldType } from "../entities/form";
 import FieldAddImage from "./FieldAddImage";
+import clsx from "clsx";
+import { MdDeleteForever } from "react-icons/md";
 
 const SelectField: React.FC<{
-  fieldId: string;
+  field: SelectFieldType;
   listeners: any;
   attributes: any;
-}> = ({ fieldId, listeners, attributes }) => {
-  const { formFields, changeOption, addOption } = useFormStore();
-  const formField = formFields.find(
-    (field) => field.id === fieldId
-  ) as SelectFieldType;
-
-  if (!formField) return null; // Handle case where field is not found
+}> = ({ field, listeners, attributes }) => {
+  const { changeOption, addOption, changeCorrectAnswer, removeOption } =
+    useFormStore();
+  function handleChangeCorrectAnswer(newVal: string) {
+    if (newVal === field.correctAnswer) {
+      changeCorrectAnswer(field.id, "");
+    } else {
+      changeCorrectAnswer(field.id, newVal);
+    }
+  }
 
   return (
     <div className="flex gap-2 px-5 py-5 border border-slate-300 rounded-md">
       <div className="grow flex flex-col gap-6 ">
         <div className="flex flex-col md:flex-row gap-4">
-          <FieldQuestion fieldId={fieldId} />
-          <FieldChooseAnsType fieldId={fieldId} />
+          <FieldQuestion field={field} />
+          <FieldChooseAnsType field={field} />
         </div>
-        <FieldAddImage fieldId={fieldId} />
+        <FieldAddImage field={field} />
 
         <div className="flex flex-col gap-3 items-start">
-          {formField.options.map((option) => (
+          {field.options.map((option) => (
             <div key={option.id} className="flex items-center gap-2">
-              <Circle size={20} />
+              <button
+                className="border-4 border-slate-300 rounded-full w-4 h-4 flex items-center justify-center"
+                onClick={() => handleChangeCorrectAnswer(option.id)}
+              >
+                <div
+                  className={clsx("rounded-full w-2 h-2 ", {
+                    "bg-white": option.id !== field.correctAnswer,
+                    "bg-blue-500": option.id === field.correctAnswer,
+                  })}
+                />
+              </button>
               <input
                 className=" font-medium text-sm border-b-2 border-slate-400 focus:border-black focus:border-b-[3px] outline-none transition-all duration-200 caret-black"
                 type="text"
                 placeholder="option"
                 value={option.value}
-                onChange={(e) => changeOption(fieldId, option.id, e)}
+                onChange={(e) => changeOption(field.id, option.id, e)}
+              />
+              <MdDeleteForever
+                className="w-8 h-8"
+                onClick={() => removeOption(field.id, option.id)}
               />
             </div>
           ))}
-          <button onClick={() => addOption(fieldId)}>Add Option</button>
+          <button onClick={() => addOption(field.id)}>Add Option</button>
         </div>
-        <FieldActions fieldId={fieldId} />
+        <FieldActions field={field} />
       </div>
       <div
-        className="self-center flex items-center cursor-grab p-2 bg-gray-200 rounded-md"
+        className="self-center w-8 h-20 flex items-center justify-center cursor-grab p-2 bg-gray-200 rounded-md"
         {...listeners}
         {...attributes}
       >

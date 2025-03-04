@@ -1,14 +1,13 @@
 import { v4 as uuidv4 } from "uuid";
-import { Form, FormField, FieldTypes } from "../entities/form";
+import { Form, FormField, FieldType } from "../entities/form";
 
 export function convertFieldType(
   field: FormField,
-  newType: FieldTypes
+  newType: FieldType
 ): FormField {
   const baseFieldProperties = {
     id: field.id,
     question: field.question,
-    required: field.required,
     inlineImg: field.inlineImg,
   };
 
@@ -17,50 +16,39 @@ export function convertFieldType(
     text: () => ({
       ...baseFieldProperties,
       type: "text" as const,
-    }),
-    number: () => ({
-      ...baseFieldProperties,
-      type: "number" as const,
-    }),
-    date: () => ({
-      ...baseFieldProperties,
-      type: "date" as const,
-    }),
-    time: () => ({
-      ...baseFieldProperties,
-      type: "time" as const,
-    }),
-    email: () => ({
-      ...baseFieldProperties,
-      type: "email" as const,
-    }),
-    url: () => ({
-      ...baseFieldProperties,
-      type: "url" as const,
-    }),
-    tel: () => ({
-      ...baseFieldProperties,
-      type: "tel" as const,
-    }),
-    select: () => ({
-      ...baseFieldProperties,
-      type: "select" as const,
-      options: [{ id: uuidv4(), value: "" }],
-    }),
-    radio: () => ({
-      ...baseFieldProperties,
-      type: "radio" as const,
-      options: [{ id: uuidv4(), value: "" }],
-    }),
-    checkbox: () => ({
-      ...baseFieldProperties,
-      type: "checkbox" as const,
-      options: [{ id: uuidv4(), value: "" }],
+      correctAnswer: "",
     }),
     multipleChoice: () => ({
       ...baseFieldProperties,
       type: "multipleChoice" as const,
       options: [{ id: uuidv4(), value: "" }],
+      correctAnswer: "",
+    }),
+    fillInBlank: () => ({
+      ...baseFieldProperties,
+      type: "fillInBlank" as const,
+      correctAnswer: "",
+    }),
+    match: () => ({
+      ...baseFieldProperties,
+      type: "match" as const,
+      correctAnswer: [
+        {
+          id: uuidv4(),
+          prompt: "",
+          description: "",
+        },
+        {
+          id: uuidv4(),
+          prompt: "",
+          description: "",
+        },
+        {
+          id: uuidv4(),
+          prompt: "",
+          description: "",
+        },
+      ],
     }),
   };
 

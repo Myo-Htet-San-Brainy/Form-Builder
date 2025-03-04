@@ -1,53 +1,75 @@
 export interface BaseField {
   id: string;
-  question?: string;
-  type: string;
-  required?: boolean;
+  question: string;
   inlineImg?: File;
 }
 
-interface TextField extends BaseField {
-  type: "text" | "number" | "date" | "time" | "email" | "url" | "tel";
+export interface FormError {
+  key: string;
+  errors: string[];
 }
 
-export function isTextField(field: BaseField): field is TextField {
-  return (
-    field.type === "text" ||
-    field.type === "number" ||
-    field.type === "date" ||
-    field.type === "time" ||
-    field.type === "email" ||
-    field.type === "url" ||
-    field.type === "tel"
-  );
+export interface TextField extends BaseField {
+  type: "text";
+  correctAnswer: string;
+}
+
+export function isTextField(field: FormField): field is TextField {
+  return field.type === "text";
 }
 
 export interface SelectField extends BaseField {
-  type: "select" | "radio" | "checkbox" | "multipleChoice";
-  options: option[]; // Options to choose from
+  type: "multipleChoice";
+  correctAnswer: string;
+  options: Option[]; // Options to choose from
   allowMultiple?: boolean; // For checkbox fields
 }
 
-export function isSelectField(field: BaseField): field is SelectField {
-  return (
-    field.type === "select" ||
-    field.type === "radio" ||
-    field.type === "checkbox" ||
-    field.type === "multipleChoice"
-  );
+export function isSelectField(field: FormField): field is SelectField {
+  return field.type === "multipleChoice";
 }
 
-interface option {
+interface Option {
   id: string;
   value: string;
 }
 
-export type FormField = TextField | SelectField;
+export interface FillInBlankField extends BaseField {
+  type: "fillInBlank";
+  correctAnswer: string;
+}
+
+export function isFillInBlankField(
+  field: FormField
+): field is FillInBlankField {
+  return field.type === "fillInBlank";
+}
+
+export interface MatchField extends BaseField {
+  type: "match";
+  correctAnswer: MatchAnswerPair[];
+}
+export interface MatchAnswerPair {
+  id: string;
+  prompt: string;
+  description: string;
+}
+
+export function isMatchField(field: FormField): field is MatchField {
+  return field.type === "match";
+}
+
+export type FormField = TextField | SelectField | FillInBlankField | MatchField;
 
 export interface Form {
   title?: string;
   formFields: FormField[];
   currentSelectedField?: string;
+  errors: FormError[];
 }
 
-export type FieldTypes = TextField["type"] | SelectField["type"];
+export type FieldType =
+  | TextField["type"]
+  | SelectField["type"]
+  | FillInBlankField["type"]
+  | MatchField["type"];
