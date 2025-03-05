@@ -1,13 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
 import client from "../lib/mongodb";
+import { refineData } from "../utils";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    //refinement
+    const quiz = refineData(body);
+
     const QuizDb = client.db("Quiz");
     const quizCollection = QuizDb.collection("quiz");
 
-    const result = await quizCollection.insertOne(body);
+    const result = await quizCollection.insertOne(quiz);
 
     if (!result.acknowledged) {
       return NextResponse.json(

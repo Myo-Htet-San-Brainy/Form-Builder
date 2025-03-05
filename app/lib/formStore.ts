@@ -43,38 +43,9 @@ export const useFormStore = create<FormStore>((set) => ({
   formFields: [
     {
       id: uuidv4(), // Add an `id` for each field
-      type: "multipleChoice" as const,
-      options: [{ id: uuidv4(), value: "Default Option" }],
-      question: "Default Question",
-      correctAnswer: "",
-    },
-    {
-      id: uuidv4(), // Add an `id` for each field
       type: "fillInBlank" as const,
       question: "Default Question",
       correctAnswer: "",
-    },
-    {
-      id: uuidv4(), // Add an `id` for each field
-      type: "match" as const,
-      question: "Default Question",
-      correctAnswer: [
-        {
-          id: uuidv4(),
-          prompt: "",
-          description: "",
-        },
-        {
-          id: uuidv4(),
-          prompt: "",
-          description: "",
-        },
-        {
-          id: uuidv4(),
-          prompt: "",
-          description: "",
-        },
-      ],
     },
   ],
 

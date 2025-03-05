@@ -1,5 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
-import { Form, FormField, FieldType } from "../entities/form";
+import {
+  Form,
+  FormField,
+  FieldType,
+  MatchField,
+  MatchAnswerPair,
+  isMatchField,
+} from "../entities/form";
 
 export function convertFieldType(
   field: FormField,
@@ -58,4 +65,34 @@ export function convertFieldType(
 const quizPreviewAppBaseUrl = "http://localhost:3001/play";
 export function idToLink(id: string) {
   return `${quizPreviewAppBaseUrl}/${id}`;
+}
+
+export function refineData({
+  title,
+  quizFields,
+}: {
+  title: string;
+  quizFields: FormField[];
+}) {
+  let updatedQuizFields;
+  updatedQuizFields = quizFields.map((quizField) => {
+    if (isMatchField(quizField)) {
+      return refineMatch(quizField);
+    }
+    return quizField;
+  });
+  return {
+    title,
+    quizFields: updatedQuizFields,
+  };
+}
+
+export function refineMatch(matchField: MatchField) {
+  return {
+    ...matchField,
+    correctAnswer: matchField.correctAnswer.map((answer: MatchAnswerPair) => [
+      answer.prompt,
+      answer.description,
+    ]),
+  };
 }

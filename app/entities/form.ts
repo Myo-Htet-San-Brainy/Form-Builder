@@ -62,7 +62,7 @@ export function isMatchField(field: FormField): field is MatchField {
 export type FormField = TextField | SelectField | FillInBlankField | MatchField;
 
 export interface Form {
-  title?: string;
+  title: string;
   formFields: FormField[];
   currentSelectedField?: string;
   errors: FormError[];
