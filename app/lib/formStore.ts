@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { v4 as uuidv4 } from "uuid";
 import { Form, FieldType, isSelectField, FormField } from "../entities/form";
 import { convertFieldType } from "../utils/index";
+import { defaultQuizBuilderState } from "./staticData";
 
 interface FormStore extends Form {
   addNewField: () => void;
@@ -36,26 +37,25 @@ interface FormStore extends Form {
   updateCurrentQuizId: (quizId: string) => void;
   handleError: (key: any, errorMsg: string) => void;
   removeAllErrors: () => void;
+  setDefault: () => void;
 }
 
 export const useFormStore = create<FormStore>((set) => ({
   // Initial state
-  formFields: [
-    {
-      id: uuidv4(), // Add an `id` for each field
-      type: "fillInBlank" as const,
-      question: "Default Question",
-      correctAnswer: "",
-    },
-  ],
-
-  title: "Default Title",
-  errors: [],
+  ...defaultQuizBuilderState,
   updateCurrentQuizId(quizId) {
     set((state) => {
       return {
         ...state,
         currentQuizId: quizId,
+      };
+    });
+  },
+  setDefault() {
+    set((state) => {
+      return {
+        ...state,
+        ...defaultQuizBuilderState,
       };
     });
   },

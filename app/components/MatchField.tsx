@@ -15,7 +15,7 @@ const MatchField: React.FC<{
   field: MatchFieldType;
   listeners: any;
   attributes: any;
-}> = ({ field, listeners, attributes }) => {
+}> = ({ field, listeners, attributes }): React.ReactNode => {
   const { changeCorrectAnswer } = useFormStore();
 
   useEffect(() => {

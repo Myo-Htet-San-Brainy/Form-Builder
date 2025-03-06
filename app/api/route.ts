@@ -25,6 +25,7 @@ export async function POST(request: NextRequest) {
       { status: 201 } // Created
     );
   } catch (error) {
+    console.log("err inserting quiz", error);
     return NextResponse.json(
       { error: "An unexpected error occurred" },
       { status: 500 }

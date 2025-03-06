@@ -11,7 +11,7 @@ const TextField: React.FC<{
   field: TextFieldType | FillInBlankField;
   listeners: any;
   attributes: any;
-}> = ({ field, listeners, attributes }) => {
+}> = ({ field, listeners, attributes }): React.ReactNode => {
   const { changeCorrectAnswer } = useFormStore();
 
   function handleTextFieldCorrectAnsChange(

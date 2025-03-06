@@ -2,10 +2,14 @@ import { v4 as uuidv4 } from "uuid";
 import {
   Form,
   FormField,
+  isFillInBlankField,
+  isMatchField,
+  isSelectField,
+  isTextField,
   FieldType,
   MatchField,
   MatchAnswerPair,
-  isMatchField,
+  TextField,
 } from "../entities/form";
 
 export function convertFieldType(
@@ -95,4 +99,21 @@ export function refineMatch(matchField: MatchField) {
       answer.description,
     ]),
   };
+}
+
+// localstorage
+export function addQuizLink({ id, title }: { id: string; title: string }) {
+  // Get existing IDs (or initialize empty array if none exist)
+  const existingILinks = JSON.parse(localStorage.getItem("quizLinks") || "[]");
+
+  // Add new ID (if it doesn't already exist)
+  if (!existingILinks.includes(id)) {
+    existingILinks.push({ id, title });
+    // Save back to localStorage
+    localStorage.setItem("quizLinks", JSON.stringify(existingILinks));
+  }
+}
+
+export function retrieveQuizLinks(): { id: string; title: string }[] {
+  return JSON.parse(localStorage.getItem("quizLinks") ?? "[]");
 }

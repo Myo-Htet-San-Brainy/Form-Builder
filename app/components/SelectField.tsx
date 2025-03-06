@@ -13,7 +13,7 @@ const SelectField: React.FC<{
   field: SelectFieldType;
   listeners: any;
   attributes: any;
-}> = ({ field, listeners, attributes }) => {
+}> = ({ field, listeners, attributes }): React.ReactNode => {
   const { changeOption, addOption, changeCorrectAnswer, removeOption } =
     useFormStore();
   function handleChangeCorrectAnswer(newVal: string) {
