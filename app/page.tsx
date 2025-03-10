@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React from "react";
-import { idToLink, retrieveQuizLinks } from "./utils";
+import { idToLink, removeQuizById, retrieveQuizLinks } from "./utils";
 import CopyLink from "./components/CopyLink";
 
 const Page = () => {
@@ -23,9 +23,14 @@ const Page = () => {
         ) : (
           retrieveQuizLinks().map((quizLink) => (
             <CopyLink
+              quizId={quizLink.id}
               key={quizLink.id}
               link={idToLink(quizLink.id)}
               title={quizLink.title}
+              onDelete={(quizId) => {
+                removeQuizById(quizId);
+                router.refresh();
+              }}
             />
           ))
         )}

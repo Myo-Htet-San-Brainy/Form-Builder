@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
 const CopyLink = ({
+  quizId,
   link,
-  onClose,
+  onDelete,
   title,
 }: {
+  quizId: string;
   link: string;
-  onClose?: () => void;
+  onDelete: (quizId: string) => void;
   title: string;
 }) => {
   const [copied, setCopied] = useState(false);
@@ -51,6 +53,12 @@ const CopyLink = ({
             )}
           </button>
         </div>
+        <button
+          className="mt-4 btn bg-black text-white w-32 h-7"
+          onClick={() => onDelete(quizId)}
+        >
+          Delete Quiz
+        </button>
       </div>
     </div>
   );

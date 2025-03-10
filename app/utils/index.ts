@@ -117,3 +117,9 @@ export function addQuizLink({ id, title }: { id: string; title: string }) {
 export function retrieveQuizLinks(): { id: string; title: string }[] {
   return JSON.parse(localStorage.getItem("quizLinks") ?? "[]");
 }
+
+export function removeQuizById(quizId: string) {
+  let quizLinks = retrieveQuizLinks();
+  quizLinks = quizLinks.filter((quizLink) => quizLink.id !== quizId);
+  localStorage.setItem("quizLinks", JSON.stringify(quizLinks));
+}
