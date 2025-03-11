@@ -40,7 +40,7 @@ const Page = () => {
               title={quizLink.title}
               onDelete={(quizId) => {
                 removeQuizById(quizId);
-                router.refresh();
+                setStoredValue(retrieveQuizLinks());
               }}
             />
           ))
