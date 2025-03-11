@@ -37,9 +37,9 @@ import { refineData } from "../utils";
 export async function POST(request: NextRequest) {
   console.log("POST - Inserting quiz");
   try {
-    // const body = await request.json();
-    // //refinement
-    // const quiz = refineData(body);
+    const body = await request.json();
+    //refinement
+    const quiz = refineData(body);
 
     // const QuizDb = client.db("Quiz");
     // const quizCollection = QuizDb.collection("quiz");
