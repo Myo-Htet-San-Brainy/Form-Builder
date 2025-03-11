@@ -3,6 +3,7 @@ import client from "../lib/mongodb";
 import { refineData } from "../utils";
 
 export async function POST(request: NextRequest) {
+  console.log("POST - Inserting quiz");
   try {
     const body = await request.json();
     //refinement
