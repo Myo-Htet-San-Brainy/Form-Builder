@@ -2,7 +2,6 @@ import { MongoClient } from "mongodb";
 
 const uri = process.env.MONGODB_URI!; // Store this in your .env file
 const options = {};
-console.log("mongodburi:", process.env.MONGODB_URI);
 
 let client: MongoClient;
 

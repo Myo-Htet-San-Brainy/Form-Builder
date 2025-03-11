@@ -69,7 +69,7 @@ const Page = () => {
       return;
     }
     //make api call(loading, err), get the id, make the link, show the link
-    const res = await fetch("http://localhost:3000/api", {
+    const res = await fetch("/api", {
       method: "POST",
       body: JSON.stringify({ title, quizFields: formFields }),
     });
