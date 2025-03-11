@@ -25,7 +25,8 @@ import { z } from "zod";
 import { mainSchema } from "../schema/formBuilderSchema";
 import toast from "react-hot-toast";
 import LinkSharePopup from "../components/CopyLink";
-import { addQuizLink, idToLink } from "../utils";
+import { addQuizLink } from "../utils/browserUtils";
+
 import { useRouter } from "next/navigation";
 import { renderField } from "../utils/renderField";
 

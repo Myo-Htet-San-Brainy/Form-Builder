@@ -1,11 +1,22 @@
 "use client";
 import { useRouter } from "next/navigation";
-import React from "react";
-import { idToLink, removeQuizById, retrieveQuizLinks } from "./utils";
+import React, { useEffect, useState } from "react";
+import { idToLink } from "./utils";
+import { removeQuizById, retrieveQuizLinks } from "./utils/browserUtils";
 import CopyLink from "./components/CopyLink";
 
 const Page = () => {
   const router = useRouter();
+  const [storedValue, setStoredValue] = useState<
+    { id: string; title: string }[]
+  >([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setStoredValue(retrieveQuizLinks());
+    }
+  }, []);
+
   return (
     <div>
       <div className="px-5 py-5 flex justify-between gap-4">
@@ -18,10 +29,10 @@ const Page = () => {
         </button>
       </div>
       <div className="px-10 md:px-20 flex flex-col gap-4">
-        {retrieveQuizLinks().length <= 0 ? (
+        {storedValue.length <= 0 ? (
           <p>nothing to show</p>
         ) : (
-          retrieveQuizLinks().map((quizLink) => (
+          storedValue.map((quizLink) => (
             <CopyLink
               quizId={quizLink.id}
               key={quizLink.id}
