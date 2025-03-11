@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Copy, Check } from "lucide-react";
 
+type CopyItemType = "link" | "id";
+
 const CopyLink = ({
   quizId,
   link,
@@ -12,19 +14,19 @@ const CopyLink = ({
   onDelete: (quizId: string) => void;
   title: string;
 }) => {
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<CopyItemType | null>(null);
 
-  const handleCopyLink = async () => {
+  const handleCopyItem = async (item: string, type: CopyItemType) => {
     try {
-      await navigator.clipboard.writeText(link);
-      setCopied(true);
+      await navigator.clipboard.writeText(item);
+      setCopied(type);
 
       // Reset copied state after 2 seconds
       setTimeout(() => {
-        setCopied(false);
+        setCopied(null);
       }, 2000);
     } catch (err) {
-      console.error("Failed to copy link", err);
+      console.error("Failed to copy link or id", err);
     }
   };
 
@@ -35,7 +37,7 @@ const CopyLink = ({
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {title}
         </label>
-        <div className="flex items-center border rounded-md">
+        <div className="mb-2 flex items-center border rounded-md">
           <input
             type="text"
             value={link}
@@ -43,10 +45,28 @@ const CopyLink = ({
             className="flex-grow p-2 rounded-l-md bg-gray-100 text-sm truncate"
           />
           <button
-            onClick={handleCopyLink}
+            onClick={() => handleCopyItem(link, "link")}
             className="p-2 bg-blue-50 hover:bg-blue-100 rounded-r-md"
           >
-            {copied ? (
+            {copied === "link" ? (
+              <Check className="text-green-500" size={20} />
+            ) : (
+              <Copy size={20} className="text-blue-500" />
+            )}
+          </button>
+        </div>
+        <div className="flex items-center border rounded-md">
+          <input
+            type="text"
+            value={quizId}
+            readOnly
+            className="flex-grow p-2 rounded-l-md bg-gray-100 text-sm truncate"
+          />
+          <button
+            onClick={() => handleCopyItem(quizId, "id")}
+            className="p-2 bg-blue-50 hover:bg-blue-100 rounded-r-md"
+          >
+            {copied === "id" ? (
               <Check className="text-green-500" size={20} />
             ) : (
               <Copy size={20} className="text-blue-500" />
