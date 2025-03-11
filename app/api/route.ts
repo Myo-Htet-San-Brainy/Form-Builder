@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     //refinement
     const quiz = refineData(body);
 
-    // const QuizDb = client.db("Quiz");
+    const QuizDb = client.db("Quiz");
     // const quizCollection = QuizDb.collection("quiz");
 
     // const result = await quizCollection.insertOne(quiz);
