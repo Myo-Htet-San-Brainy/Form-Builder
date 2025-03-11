@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
-import client from "../lib/mongodb";
+// import client from "../lib/mongodb";
 import { refineData } from "../utils";
+import { MongoClient } from "mongodb";
 
 // export async function POST(request: NextRequest) {
 //   console.log("POST - Inserting quiz");
@@ -33,7 +34,7 @@ import { refineData } from "../utils";
 //     );
 //   }
 // }
-
+const uri = process.env.MONGODB_URI!;
 export async function POST(request: NextRequest) {
   console.log("POST - Inserting quiz");
   try {
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
     //refinement
     const quiz = refineData(body);
 
+    const client = new MongoClient(uri);
     const QuizDb = client.db("Quiz");
     // const quizCollection = QuizDb.collection("quiz");
 
