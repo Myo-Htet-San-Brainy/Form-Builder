@@ -34,7 +34,7 @@ const CopyLink = ({
     <div className="bg-white rounded-lg shadow-xl p-6 w-96 relative">
       {/* Link display area */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium text-black mb-2">
           {title}
         </label>
         <div className="mb-2 flex items-center border rounded-md">
@@ -42,7 +42,7 @@ const CopyLink = ({
             type="text"
             value={link}
             readOnly
-            className="flex-grow p-2 rounded-l-md bg-gray-100 text-sm truncate"
+            className="flex-grow p-2 rounded-l-md bg-gray-100 text-sm text-black truncate"
           />
           <button
             onClick={() => handleCopyItem(link, "link")}
@@ -60,7 +60,7 @@ const CopyLink = ({
             type="text"
             value={quizId}
             readOnly
-            className="flex-grow p-2 rounded-l-md bg-gray-100 text-sm truncate"
+            className="flex-grow p-2 rounded-l-md bg-gray-100 text-sm text-black truncate"
           />
           <button
             onClick={() => handleCopyItem(quizId, "id")}

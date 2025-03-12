@@ -87,7 +87,7 @@ const Page = () => {
   }
 
   return (
-    <div>
+    <div className="min-h-screen">
       <div className="px-5 py-5 flex justify-between gap-4">
         <h1 className="font-bold text-xl">Quiz Builder</h1>
         <div>

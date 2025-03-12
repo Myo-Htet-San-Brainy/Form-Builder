@@ -68,9 +68,9 @@ export function convertFieldType(
 
 const LOCAL = "http://localhost:3001/play";
 const VERCEL = "https://dumb-quizzes.vercel.app/play";
-const quizPreviewAppBaseUrl = VERCEL;
+
 export function idToLink(id: string) {
-  return `${quizPreviewAppBaseUrl}/${id}`;
+  return `${VERCEL}/${id}`;
 }
 
 export function refineData({
