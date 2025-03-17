@@ -5,6 +5,7 @@ import { idToLink } from "./utils";
 import { removeQuizById, retrieveQuizLinks } from "./utils/browserUtils";
 import CopyLink from "./components/CopyLink";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 const Page = () => {
   const router = useRouter();
@@ -70,7 +71,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="px-5 py-5 flex justify-between gap-4">
+      <Link href={"/"} className="px-5 py-5 flex justify-between gap-4">
         <h1 className="font-bold text-xl">Quiz Builder</h1>
         <button
           className=" btn bg-black text-white "
@@ -78,7 +79,7 @@ const Page = () => {
         >
           Create Quiz
         </button>
-      </div>
+      </Link>
       <div className="px-10 md:px-20 flex flex-col gap-4">
         {storedValue.length <= 0 ? (
           <p>nothing to show</p>

@@ -29,6 +29,7 @@ import { addQuizLink } from "../utils/browserUtils";
 
 import { useRouter } from "next/navigation";
 import { renderField } from "../utils/renderField";
+import Link from "next/link";
 
 const Page = () => {
   const {
@@ -88,7 +89,7 @@ const Page = () => {
 
   return (
     <div className="min-h-screen">
-      <div className="px-5 py-5 flex justify-between gap-4">
+      <Link href={"/"} className="px-5 py-5 flex justify-between gap-4">
         <h1 className="font-bold text-xl">Quiz Builder</h1>
         <div>
           <button
@@ -101,7 +102,7 @@ const Page = () => {
             Publish
           </button>
         </div>
-      </div>
+      </Link>
       <FormBuilder />
     </div>
   );
