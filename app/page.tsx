@@ -71,15 +71,17 @@ const Page = () => {
 
   return (
     <div className="min-h-screen">
-      <Link href={"/"} className="px-5 py-5 flex justify-between gap-4">
-        <h1 className="font-bold text-xl">Quiz Builder</h1>
+      <div className="px-5 py-5 flex justify-between gap-4">
+        <Link href={"/"} className="font-bold text-xl">
+          Quiz Builder
+        </Link>
         <button
           className=" btn bg-black text-white "
           onClick={() => router.push("/createQuiz")}
         >
           Create Quiz
         </button>
-      </Link>
+      </div>
       <div className="px-10 md:px-20 flex flex-col gap-4">
         {storedValue.length <= 0 ? (
           <p>nothing to show</p>
