@@ -40,6 +40,7 @@ const Page = () => {
     errors,
     setDefault,
     pushQuiz,
+    createdQuizzes,
   } = useFormStore();
   const router = useRouter();
 
@@ -77,6 +78,7 @@ const Page = () => {
     });
 
     const jsonRes = await res.json();
+    console.log("jsonRes", jsonRes);
     //if not 201, toast err msg
     if (res.status !== 201) {
       toast.error(jsonRes.error);
@@ -88,6 +90,7 @@ const Page = () => {
     pushQuiz(createdQuiz);
     setDefault();
     toast.success("Quiz created successfully.");
+    console.log("about to navigate");
     router.push("/");
   }
 

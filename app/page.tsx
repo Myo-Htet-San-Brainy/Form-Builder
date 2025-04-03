@@ -12,6 +12,7 @@ const Page = () => {
   const isClient = typeof window === "object";
   const router = useRouter();
   const { createdQuizzes, deleteQuiz } = useFormStore();
+  console.log("quizzes in display page", createdQuizzes);
 
   async function handleQuizLinkDelete(quizId: string) {
     try {
