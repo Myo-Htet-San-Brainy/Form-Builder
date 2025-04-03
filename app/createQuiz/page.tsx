@@ -78,7 +78,7 @@ const Page = () => {
     });
 
     const jsonRes = await res.json();
-    console.log("jsonRes", jsonRes);
+
     //if not 201, toast err msg
     if (res.status !== 201) {
       toast.error(jsonRes.error);
@@ -90,14 +90,15 @@ const Page = () => {
     pushQuiz(createdQuiz);
     setDefault();
     toast.success("Quiz created successfully.");
-    console.log("about to navigate");
     router.push("/");
   }
 
   return (
     <div className="min-h-screen">
-      <Link href={"/"} className="px-5 py-5 flex justify-between gap-4">
-        <h1 className="font-bold text-xl">Quiz Builder</h1>
+      <div className="px-5 py-5 flex justify-between gap-4">
+        <Link href={"/"} className="font-bold text-xl">
+          Quiz Builder
+        </Link>
         <div className="flex gap-2">
           <button
             className=" btn bg-white text-black hover:text-sky-300 hover:bg-white"
@@ -112,7 +113,7 @@ const Page = () => {
             Publish
           </button>
         </div>
-      </Link>
+      </div>
       <FormBuilder />
     </div>
   );
