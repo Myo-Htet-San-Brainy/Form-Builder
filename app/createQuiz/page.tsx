@@ -25,7 +25,7 @@ import { z } from "zod";
 import { mainSchema } from "../schema/formBuilderSchema";
 import toast from "react-hot-toast";
 import LinkSharePopup from "../components/CopyLink";
-import { addQuizLink } from "../utils/browserUtils";
+import { addQuizLink, retrieveQuizLinks } from "../utils/browserUtils";
 
 import { useRouter } from "next/navigation";
 import { renderField } from "../utils/renderField";
@@ -39,6 +39,7 @@ const Page = () => {
     removeAllErrors,
     errors,
     setDefault,
+    pushQuiz,
   } = useFormStore();
   const router = useRouter();
 
@@ -74,14 +75,17 @@ const Page = () => {
       method: "POST",
       body: JSON.stringify({ title, quizFields: formFields }),
     });
+
     const jsonRes = await res.json();
     //if not 201, toast err msg
     if (res.status !== 201) {
       toast.error(jsonRes.error);
       return;
     }
-    //if 201, save to localstorage and default state and toast and navigate
-    addQuizLink({ id: jsonRes.data.insertedId, title });
+    //if 201,update state and save to localstorage and default state and toast and navigate
+    const createdQuiz = { id: jsonRes.data.insertedId, title };
+    addQuizLink(createdQuiz);
+    pushQuiz(createdQuiz);
     setDefault();
     toast.success("Quiz created successfully.");
     router.push("/");
@@ -91,14 +95,14 @@ const Page = () => {
     <div className="min-h-screen">
       <Link href={"/"} className="px-5 py-5 flex justify-between gap-4">
         <h1 className="font-bold text-xl">Quiz Builder</h1>
-        <div>
+        <div className="flex gap-2">
           <button
-            className=" btn bg-black text-white "
+            className=" btn bg-white text-black "
             onClick={() => router.push("/")}
           >
             Quizzes
           </button>
-          <button className=" btn bg-black text-white " onClick={handlePublish}>
+          <button className=" btn bg-white text-black " onClick={handlePublish}>
             Publish
           </button>
         </div>
@@ -242,7 +246,7 @@ const FormBuilder = () => {
       {/*END OF FORM FIELDS */}
       {/* actions */}
       <div className="flex justify-end">
-        <button onClick={addNewField} className="w-32 btn bg-black text-white">
+        <button onClick={addNewField} className="w-32 btn bg-white text-black">
           add new field
         </button>
       </div>

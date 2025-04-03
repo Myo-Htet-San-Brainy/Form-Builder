@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Form, FieldType, isSelectField, FormField } from "../entities/form";
 import { convertFieldType } from "../utils/index";
 import { defaultQuizBuilderState } from "./staticData";
+import { retrieveQuizLinks } from "../utils/browserUtils";
 
 interface FormStore extends Form {
   addNewField: () => void;
@@ -38,11 +39,33 @@ interface FormStore extends Form {
   handleError: (key: any, errorMsg: string) => void;
   removeAllErrors: () => void;
   setDefault: () => void;
+  createdQuizzes: { id: string; title: string }[];
+  pushQuiz: (quiz: { id: string; title: string }) => void;
+  deleteQuiz: (quidId: string) => void;
 }
 
 export const useFormStore = create<FormStore>((set) => ({
   // Initial state
   ...defaultQuizBuilderState,
+  createdQuizzes: retrieveQuizLinks(),
+  pushQuiz(quiz) {
+    set((state) => {
+      return {
+        ...state,
+        createdQuizzes: [...state.createdQuizzes, quiz],
+      };
+    });
+  },
+  deleteQuiz(quidId) {
+    set((state) => {
+      return {
+        ...state,
+        createdQuizzes: state.createdQuizzes.filter(
+          (quiz) => quiz.id !== quidId
+        ),
+      };
+    });
+  },
   updateCurrentQuizId(quizId) {
     set((state) => {
       return {

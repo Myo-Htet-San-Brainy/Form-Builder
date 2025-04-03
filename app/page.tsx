@@ -6,18 +6,12 @@ import { removeQuizById, retrieveQuizLinks } from "./utils/browserUtils";
 import CopyLink from "./components/CopyLink";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import { useFormStore } from "./lib/formStore";
 
 const Page = () => {
+  const isClient = typeof window === "object";
   const router = useRouter();
-  const [storedValue, setStoredValue] = useState<
-    { id: string; title: string }[]
-  >([]);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setStoredValue(retrieveQuizLinks());
-    }
-  }, []);
+  const { createdQuizzes, deleteQuiz } = useFormStore();
 
   async function handleQuizLinkDelete(quizId: string) {
     try {
@@ -34,9 +28,9 @@ const Page = () => {
         const data = await response.json();
         console.log("Quiz deleted successfully:", data.deletedQuiz);
 
-        // Update the local state/storage after successful deletion
+        // Update state and the local state/storage after successful deletion
         removeQuizById(quizId);
-        setStoredValue(retrieveQuizLinks());
+        deleteQuiz(quizId);
 
         // You might want to show a success message to the user
 
@@ -68,6 +62,7 @@ const Page = () => {
       return false;
     }
   }
+  // console.log(storedValue);
 
   return (
     <div className="min-h-screen">
@@ -76,17 +71,17 @@ const Page = () => {
           Quiz Builder
         </Link>
         <button
-          className=" btn bg-black text-white "
+          className="btn bg-white text-black"
           onClick={() => router.push("/createQuiz")}
         >
           Create Quiz
         </button>
       </div>
       <div className="px-10 md:px-20 flex flex-col gap-4">
-        {storedValue.length <= 0 ? (
-          <p>nothing to show</p>
+        {createdQuizzes.length <= 0 ? (
+          <p className="text-gray-500 text-center py-10">Nothing to show</p>
         ) : (
-          storedValue.map((quizLink) => (
+          createdQuizzes.map((quizLink) => (
             <CopyLink
               quizId={quizLink.id}
               key={quizLink.id}
