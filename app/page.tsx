@@ -71,7 +71,7 @@ const Page = () => {
           Quiz Builder
         </Link>
         <button
-          className="btn bg-white text-black"
+          className="btn bg-white text-black hover:text-sky-300 hover:bg-white"
           onClick={() => router.push("/createQuiz")}
         >
           Create Quiz

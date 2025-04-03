@@ -97,12 +97,15 @@ const Page = () => {
         <h1 className="font-bold text-xl">Quiz Builder</h1>
         <div className="flex gap-2">
           <button
-            className=" btn bg-white text-black "
+            className=" btn bg-white text-black hover:text-sky-300 hover:bg-white"
             onClick={() => router.push("/")}
           >
             Quizzes
           </button>
-          <button className=" btn bg-white text-black " onClick={handlePublish}>
+          <button
+            className=" btn bg-white text-black hover:text-sky-300 hover:bg-white"
+            onClick={handlePublish}
+          >
             Publish
           </button>
         </div>
@@ -246,7 +249,10 @@ const FormBuilder = () => {
       {/*END OF FORM FIELDS */}
       {/* actions */}
       <div className="flex justify-end">
-        <button onClick={addNewField} className="w-32 btn bg-white text-black">
+        <button
+          onClick={addNewField}
+          className="w-32 btn bg-white text-black hover:text-sky-300 hover:bg-white"
+        >
           add new field
         </button>
       </div>

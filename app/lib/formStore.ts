@@ -43,11 +43,11 @@ interface FormStore extends Form {
   pushQuiz: (quiz: { id: string; title: string }) => void;
   deleteQuiz: (quidId: string) => void;
 }
-
+const isClient = typeof window === "object";
 export const useFormStore = create<FormStore>((set) => ({
   // Initial state
   ...defaultQuizBuilderState,
-  createdQuizzes: retrieveQuizLinks(),
+  createdQuizzes: isClient ? retrieveQuizLinks() : [],
   pushQuiz(quiz) {
     set((state) => {
       return {

@@ -8,6 +8,7 @@ import { SelectField as SelectFieldType } from "../entities/form";
 import FieldAddImage from "./FieldAddImage";
 import clsx from "clsx";
 import { MdDeleteForever } from "react-icons/md";
+import { RxDragHandleDots1 } from "react-icons/rx";
 
 const SelectField: React.FC<{
   field: SelectFieldType;
@@ -65,11 +66,11 @@ const SelectField: React.FC<{
         <FieldActions field={field} />
       </div>
       <div
-        className="self-center w-8 h-20 flex items-center justify-center cursor-grab p-2 bg-gray-200 rounded-md"
+        className="self-center w-8 h-20 cursor-grab flex items-center  bg-gray-200 rounded-md"
         {...listeners}
         {...attributes}
       >
-        ⠿
+        <RxDragHandleDots1 className="text-black w-full h-7" />
       </div>
     </div>
   );

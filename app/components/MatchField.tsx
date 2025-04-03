@@ -8,6 +8,7 @@ import { FiPlusSquare } from "react-icons/fi";
 import { useFormStore } from "../lib/formStore";
 import { v4 as uuidv4 } from "uuid";
 import toast from "react-hot-toast";
+import { RxDragHandleDots1 } from "react-icons/rx";
 
 const ansPairLimit = 5;
 
@@ -114,11 +115,11 @@ const MatchField: React.FC<{
         <FieldActions field={field} />
       </div>
       <div
-        className="self-center w-8 h-20 flex items-center justify-center cursor-grab p-2 bg-gray-200 rounded-md"
+        className="self-center w-8 h-20 cursor-grab flex items-center  bg-gray-200 rounded-md"
         {...listeners}
         {...attributes}
       >
-        ⠿
+        <RxDragHandleDots1 className="text-black w-full h-7" />
       </div>
     </div>
   );
